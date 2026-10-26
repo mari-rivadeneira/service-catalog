@@ -1,13 +1,13 @@
 package com.example.hexagonal.catalog.infrastructure.persistence.mapper;
 
 import com.example.hexagonal.catalog.domain.model.SyncVersion;
-import com.example.hexagonal.catalog.infrastructure.persistence.entity.SyncStateEntity;
+import com.example.hexagonal.catalog.infrastructure.persistence.entity.SyncVersionEntity;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SyncStateMapper {
+public class SyncVersionMapper {
 
-    public SyncVersion toDomain(SyncStateEntity entity) {
+    public SyncVersion toDomain(SyncVersionEntity entity) {
         if (entity == null) return null;
         return new SyncVersion(
                 entity.getEntityName(),
@@ -16,9 +16,9 @@ public class SyncStateMapper {
         );
     }
 
-    public SyncStateEntity toEntity(SyncVersion domain) {
+    public SyncVersionEntity toEntity(SyncVersion domain) {
         if (domain == null) return null;
-        return new SyncStateEntity(
+        return new SyncVersionEntity(
                 domain.getEntityName(),
                 domain.getVersion(),
                 domain.getLastSyncedAt()

@@ -5,7 +5,7 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "sync_state")
-public class SyncStateEntity {
+public class SyncVersionEntity {
 
     @Id
     @Column(name = "entity_name", length = 100)
@@ -17,9 +17,9 @@ public class SyncStateEntity {
     @Column(name = "last_synced_at")
     private Instant lastSyncedAt;
 
-    public SyncStateEntity() {}
+    public SyncVersionEntity() {}
 
-    public SyncStateEntity(String entityName, Long version, Instant lastSyncedAt) {
+    public SyncVersionEntity(String entityName, Long version, Instant lastSyncedAt) {
         this.entityName = entityName;
         this.version = version;
         this.lastSyncedAt = lastSyncedAt;
