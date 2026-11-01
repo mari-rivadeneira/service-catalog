@@ -39,19 +39,19 @@ public class CatedraSnapshotMapper {
         return new CatedraSnapshot(dto.snapshotVersion(), categories, professionals, schedules);
     }
 
-    private ProfessionalCategory toCategory(CategoryDto c) {
+    public ProfessionalCategory toCategory(CategoryDto c) {
         return new ProfessionalCategory(require(c.id(), "professionalCategories.id"), c.name(),
                 c.description(), require(c.enabled(), "professionalCategories.enabled"),
                 c.createdAt(), c.updatedAt());
     }
 
-    private Professional toProfessional(ProfessionalDto p) {
+    public Professional toProfessional(ProfessionalDto p) {
         return new Professional(require(p.id(), "professionals.id"),
                 require(p.categoryId(), "professionals.categoryId"), p.firstName(), p.lastName(),
                 require(p.enabled(), "professionals.enabled"), p.createdAt(), p.updatedAt());
     }
 
-    private WeeklySchedule toSchedule(WeeklyScheduleDto s) {
+    public WeeklySchedule toSchedule(WeeklyScheduleDto s) {
         return new WeeklySchedule(require(s.id(), "weeklySchedules.id"),
                 require(s.professionalId(), "weeklySchedules.professionalId"),
                 parseDay(s.dayOfWeek()), s.startTime(), s.endTime(),
