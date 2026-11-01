@@ -8,20 +8,17 @@ import org.springframework.stereotype.Component;
 public class SyncVersionMapper {
 
     public SyncVersion toDomain(SyncVersionEntity entity) {
-        if (entity == null) return null;
-        return new SyncVersion(
-                entity.getEntityName(),
-                entity.getVersion(),
-                entity.getLastSyncedAt()
-        );
+        return new SyncVersion(entity.getEntityName(), entity.getVersion(), entity.getLastSyncedAt(),
+                entity.getLastMode(), entity.getLastError());
     }
 
-    public SyncVersionEntity toEntity(SyncVersion domain) {
-        if (domain == null) return null;
-        return new SyncVersionEntity(
-                domain.getEntityName(),
-                domain.getVersion(),
-                domain.getLastSyncedAt()
-        );
+    public SyncVersionEntity toEntity(SyncVersion syncVersion) {
+        SyncVersionEntity entity = new SyncVersionEntity();
+        entity.setEntityName(syncVersion.getEntityName());
+        entity.setVersion(syncVersion.getVersion());
+        entity.setLastSyncedAt(syncVersion.getLastSyncedAt());
+        entity.setLastMode(syncVersion.getLastMode());
+        entity.setLastError(syncVersion.getLastError());
+        return entity;
     }
 }
