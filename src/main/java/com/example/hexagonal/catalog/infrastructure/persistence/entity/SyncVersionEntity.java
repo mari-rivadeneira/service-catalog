@@ -1,6 +1,13 @@
 package com.example.hexagonal.catalog.infrastructure.persistence.entity;
 
-import jakarta.persistence.*;
+import com.example.hexagonal.catalog.domain.model.SyncMode;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
 import java.time.Instant;
 
 @Entity
@@ -12,24 +19,29 @@ public class SyncVersionEntity {
     private String entityName;
 
     @Column(nullable = false)
-    private Long version;
+    private long version;
 
-    @Column(name = "last_synced_at")
+    @Column(name = "last_synced_at", nullable = false)
     private Instant lastSyncedAt;
 
-    public SyncVersionEntity() {}
+    @Enumerated(EnumType.STRING)
+    @Column(name = "last_mode", length = 20)
+    private SyncMode lastMode;
 
-    public SyncVersionEntity(String entityName, Long version, Instant lastSyncedAt) {
-        this.entityName = entityName;
-        this.version = version;
-        this.lastSyncedAt = lastSyncedAt;
+    @Column(name = "last_error")
+    private String lastError;
+
+    public SyncVersionEntity() {
     }
 
-    // Getters y Setters
     public String getEntityName() { return entityName; }
     public void setEntityName(String entityName) { this.entityName = entityName; }
-    public Long getVersion() { return version; }
-    public void setVersion(Long version) { this.version = version; }
+    public long getVersion() { return version; }
+    public void setVersion(long version) { this.version = version; }
     public Instant getLastSyncedAt() { return lastSyncedAt; }
     public void setLastSyncedAt(Instant lastSyncedAt) { this.lastSyncedAt = lastSyncedAt; }
+    public SyncMode getLastMode() { return lastMode; }
+    public void setLastMode(SyncMode lastMode) { this.lastMode = lastMode; }
+    public String getLastError() { return lastError; }
+    public void setLastError(String lastError) { this.lastError = lastError; }
 }
