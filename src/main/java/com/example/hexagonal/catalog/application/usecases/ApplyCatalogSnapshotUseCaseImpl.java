@@ -35,6 +35,10 @@ public class ApplyCatalogSnapshotUseCaseImpl implements ApplyCatalogSnapshotUseC
     public void applySnapshot(CatedraSnapshot snapshot) {
         validate(snapshot);
 
+        // Bloquea la fila de estado: serializa este snapshot con cualquier sincronizacion incremental en curso
+        SyncVersion state = syncVersionRepository.findByEntityNameForUpdate(SyncVersion.CATALOG_KEY)
+                .orElseGet(SyncVersion::initial);
+
         // Reemplazo completo de la copia local: borrado en orden inverso de FK
         weeklyScheduleRepository.deleteAll();
         professionalRepository.deleteAll();
@@ -45,8 +49,7 @@ public class ApplyCatalogSnapshotUseCaseImpl implements ApplyCatalogSnapshotUseC
         professionalRepository.saveAll(snapshot.getProfessionals());
         weeklyScheduleRepository.saveAll(snapshot.getSchedules());
 
-        SyncVersion state = syncVersionRepository.findByEntityName(SyncVersion.CATALOG_KEY)
-                .orElseGet(SyncVersion::initial);
+        // Se registra exactamente la version del snapshot aplicado, en la misma transaccion
         state.rebuiltFromSnapshot(snapshot.getVersion());
         syncVersionRepository.save(state);
     }

@@ -75,7 +75,7 @@ class ApplyCatalogSnapshotUseCaseTest {
     @DisplayName("Debe reemplazar la copia local en orden de FK y registrar la version del snapshot")
     void shouldReplaceLocalCopyAndRegisterVersion() {
         CatedraSnapshot snapshot = snapshotWithVersion(10L);
-        when(syncVersionRepository.findByEntityName(SyncVersion.CATALOG_KEY)).thenReturn(Optional.empty());
+        when(syncVersionRepository.findByEntityNameForUpdate(SyncVersion.CATALOG_KEY)).thenReturn(Optional.empty());
 
         useCase.applySnapshot(snapshot);
 
@@ -103,7 +103,7 @@ class ApplyCatalogSnapshotUseCaseTest {
     void shouldAdoptSnapshotVersionEvenIfLowerThanLocal() {
         SyncVersion existing = new SyncVersion(SyncVersion.CATALOG_KEY, 50L, Instant.now(),
                 SyncMode.INCREMENTAL, "fallo anterior");
-        when(syncVersionRepository.findByEntityName(SyncVersion.CATALOG_KEY)).thenReturn(Optional.of(existing));
+        when(syncVersionRepository.findByEntityNameForUpdate(SyncVersion.CATALOG_KEY)).thenReturn(Optional.of(existing));
 
         useCase.applySnapshot(snapshotWithVersion(10L));
 
