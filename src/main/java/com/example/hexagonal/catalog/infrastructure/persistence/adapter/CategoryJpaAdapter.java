@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
 public class CategoryJpaAdapter implements CategoryRepository {
@@ -27,13 +26,14 @@ public class CategoryJpaAdapter implements CategoryRepository {
     }
 
     @Override
-    public Optional<ProfessionalCategory> findById(UUID id) {
-        return repository.findById(id).map(mapper::toDomain);
+    public List<ProfessionalCategory> saveAll(List<ProfessionalCategory> categories) {
+        return repository.saveAll(categories.stream().map(mapper::toEntity).toList())
+                .stream().map(mapper::toDomain).toList();
     }
 
     @Override
-    public Optional<ProfessionalCategory> findByName(String name) {
-        return repository.findByName(name).map(mapper::toDomain);
+    public Optional<ProfessionalCategory> findById(Long id) {
+        return repository.findById(id).map(mapper::toDomain);
     }
 
     @Override
@@ -42,12 +42,8 @@ public class CategoryJpaAdapter implements CategoryRepository {
     }
 
     @Override
-    public boolean existsByName(String name) {
-        return repository.existsByName(name);
-    }
-
-    @Override
-    public void deleteById(UUID id) {
-        repository.deleteById(id);
+    public void deleteAll() {
+        // Borrado en batch: se ejecuta de inmediato, antes de las reinserciones del mismo snapshot
+        repository.deleteAllInBatch();
     }
 }

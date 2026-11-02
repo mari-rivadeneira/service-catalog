@@ -8,24 +8,18 @@ import org.springframework.stereotype.Component;
 public class CategoryMapper {
 
     public ProfessionalCategory toDomain(CategoryEntity entity) {
-        if (entity == null) return null;
-        return new ProfessionalCategory(
-                entity.getId(),
-                entity.getName(),
-                entity.getDescription(),
-                entity.getCreatedAt(),
-                entity.getUpdatedAt()
-        );
+        return new ProfessionalCategory(entity.getId(), entity.getName(), entity.getDescription(),
+                entity.isEnabled(), entity.getCreatedAt(), entity.getUpdatedAt());
     }
 
-    public CategoryEntity toEntity(ProfessionalCategory domain) {
-        if (domain == null) return null;
-        return new CategoryEntity(
-                domain.getId(),
-                domain.getName(),
-                domain.getDescription(),
-                domain.getCreatedAt(),
-                domain.getUpdatedAt()
-        );
+    public CategoryEntity toEntity(ProfessionalCategory category) {
+        CategoryEntity entity = new CategoryEntity();
+        entity.setId(category.getId());
+        entity.setName(category.getName());
+        entity.setDescription(category.getDescription());
+        entity.setEnabled(category.isEnabled());
+        entity.setCreatedAt(category.getCreatedAt());
+        entity.setUpdatedAt(category.getUpdatedAt());
+        return entity;
     }
 }

@@ -1,22 +1,29 @@
 package com.example.hexagonal.catalog.infrastructure.persistence.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+import java.time.DayOfWeek;
+import java.time.Instant;
 import java.time.LocalTime;
-import java.util.UUID;
 
 @Entity
 @Table(name = "weekly_schedules")
 public class WeeklyScheduleEntity {
 
     @Id
-    private UUID id;
+    private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "professional_id", nullable = false)
-    private ProfessionalEntity professional;
+    @Column(name = "professional_id", nullable = false)
+    private Long professionalId;
 
-    @Column(name = "day_of_week", nullable = false, length = 20)
-    private String dayOfWeek;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "day_of_week", nullable = false, length = 15)
+    private DayOfWeek dayOfWeek;
 
     @Column(name = "start_time", nullable = false)
     private LocalTime startTime;
@@ -27,29 +34,34 @@ public class WeeklyScheduleEntity {
     @Column(name = "slot_duration_minutes", nullable = false)
     private int slotDurationMinutes;
 
-    public WeeklyScheduleEntity() {}
+    @Column(nullable = false)
+    private boolean enabled;
 
-    public WeeklyScheduleEntity(UUID id, ProfessionalEntity professional, String dayOfWeek,
-                                LocalTime startTime, LocalTime endTime, int slotDurationMinutes) {
-        this.id = id;
-        this.professional = professional;
-        this.dayOfWeek = dayOfWeek;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.slotDurationMinutes = slotDurationMinutes;
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
+
+    public WeeklyScheduleEntity() {
     }
 
-    // Getters y Setters
-    public UUID getId() { return id; }
-    public void setId(UUID id) { this.id = id; }
-    public ProfessionalEntity getProfessional() { return professional; }
-    public void setProfessional(ProfessionalEntity professional) { this.professional = professional; }
-    public String getDayOfWeek() { return dayOfWeek; }
-    public void setDayOfWeek(String dayOfWeek) { this.dayOfWeek = dayOfWeek; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public Long getProfessionalId() { return professionalId; }
+    public void setProfessionalId(Long professionalId) { this.professionalId = professionalId; }
+    public DayOfWeek getDayOfWeek() { return dayOfWeek; }
+    public void setDayOfWeek(DayOfWeek dayOfWeek) { this.dayOfWeek = dayOfWeek; }
     public LocalTime getStartTime() { return startTime; }
     public void setStartTime(LocalTime startTime) { this.startTime = startTime; }
     public LocalTime getEndTime() { return endTime; }
     public void setEndTime(LocalTime endTime) { this.endTime = endTime; }
     public int getSlotDurationMinutes() { return slotDurationMinutes; }
     public void setSlotDurationMinutes(int slotDurationMinutes) { this.slotDurationMinutes = slotDurationMinutes; }
+    public boolean isEnabled() { return enabled; }
+    public void setEnabled(boolean enabled) { this.enabled = enabled; }
+    public Instant getCreatedAt() { return createdAt; }
+    public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
+    public Instant getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(Instant updatedAt) { this.updatedAt = updatedAt; }
 }
