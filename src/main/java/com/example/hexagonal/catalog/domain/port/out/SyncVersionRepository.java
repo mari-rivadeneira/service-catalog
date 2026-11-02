@@ -6,4 +6,5 @@ import java.util.Optional;
 public interface SyncVersionRepository {
     SyncVersion save(SyncVersion syncState);
     Optional<SyncVersion> findByEntityName(String entityName);
+    Optional<SyncVersion> findByEntityNameForUpdate(String entityName);
 }

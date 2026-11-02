@@ -28,4 +28,9 @@ public class SyncVersionJpaAdapter implements SyncVersionRepository {
     public Optional<SyncVersion> findByEntityName(String entityName) {
         return repository.findById(entityName).map(mapper::toDomain);
     }
+
+    @Override
+    public Optional<SyncVersion> findByEntityNameForUpdate(String entityName) {
+        return repository.findByEntityNameForUpdate(entityName).map(mapper::toDomain);
+    }
 }
