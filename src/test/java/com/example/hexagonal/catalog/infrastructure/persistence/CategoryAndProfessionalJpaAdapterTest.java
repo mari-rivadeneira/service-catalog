@@ -187,4 +187,25 @@ class CategoryAndProfessionalJpaAdapterTest {
         assertTrue(professionalRepository.findById(PROFESSIONAL_ID).isPresent());
         assertTrue(weeklyScheduleRepository.findById(SCHEDULE_ID).isPresent());
     }
+
+    @Test
+    @DisplayName("updateLastError registra y limpia el error sin tocar la version")
+    void shouldUpdateLastErrorWithoutTouchingVersion() {
+        String entityName = "TEST_STATE_ERROR";
+        syncVersionRepository.save(new SyncVersion(entityName, 7L, Instant.now(), SyncMode.INCREMENTAL, null));
+        flushAndClear();
+
+        syncVersionRepository.updateLastError(entityName, "Redis no disponible");
+        flushAndClear();
+
+        SyncVersion withError = syncVersionRepository.findByEntityName(entityName).orElseThrow();
+        assertEquals(7L, withError.getVersion());
+        assertEquals(SyncMode.INCREMENTAL, withError.getLastMode());
+        assertEquals("Redis no disponible", withError.getLastError());
+
+        syncVersionRepository.updateLastError(entityName, null);
+        flushAndClear();
+
+        assertNull(syncVersionRepository.findByEntityName(entityName).orElseThrow().getLastError());
+    }
 }
