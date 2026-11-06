@@ -93,12 +93,9 @@ public class RegisterUserUseCaseImpl implements RegisterUserUseCase {
             errors.put("email", "no tiene un formato valido");
         }
 
-        if (command.firstName() != null && command.firstName().length() > 50) {
-            errors.put("firstName", "no puede superar los 50 caracteres");
-        }
-        if (command.lastName() != null && command.lastName().length() > 50) {
-            errors.put("lastName", "no puede superar los 50 caracteres");
-        }
+        validateName(errors, "firstName", command.firstName());
+        validateName(errors, "lastName", command.lastName());
+
         if (command.imageUrl() != null && command.imageUrl().length() > 256) {
             errors.put("imageUrl", "no puede superar los 256 caracteres");
         }
@@ -109,6 +106,14 @@ public class RegisterUserUseCaseImpl implements RegisterUserUseCase {
 
         if (!errors.isEmpty()) {
             throw new InvalidUserDataException(errors);
+        }
+    }
+
+    private static void validateName(Map<String, String> errors, String field, String value) {
+        if (isBlank(value)) {
+            errors.put(field, "es obligatorio");
+        } else if (value.length() > 50) {
+            errors.put(field, "no puede superar los 50 caracteres");
         }
     }
 

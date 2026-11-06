@@ -60,6 +60,7 @@ class RegisterUserUseCaseTest {
         assertEquals("marina@example.com", saved.getEmail());
         assertEquals("hash-argon2", saved.getPasswordHash());
         assertEquals("Marina", saved.getFirstName());
+        assertEquals("Rivadeneira", saved.getLastName());
         assertNull(saved.getImageUrl());
         assertTrue(saved.isActivated());
         assertEquals("es", saved.getLangKey());
@@ -80,15 +81,29 @@ class RegisterUserUseCaseTest {
         assertTrue(ex.getFieldErrors().containsKey("login"));
         assertTrue(ex.getFieldErrors().containsKey("password"));
         assertTrue(ex.getFieldErrors().containsKey("email"));
+        assertTrue(ex.getFieldErrors().containsKey("firstName"));
         assertTrue(ex.getFieldErrors().containsKey("lastName"));
         assertTrue(ex.getFieldErrors().containsKey("langKey"));
         verifyNoInteractions(userRepository, passwordHasher);
     }
 
     @Test
+    @DisplayName("firstName y lastName son obligatorios")
+    void shouldRejectMissingNames() {
+        RegisterUserCommand command = new RegisterUserCommand("marina.r", "clave-segura", " ", null,
+                "marina@example.com", null, null);
+
+        InvalidUserDataException ex = assertThrows(InvalidUserDataException.class, () -> useCase.register(command));
+
+        assertTrue(ex.getFieldErrors().containsKey("firstName"));
+        assertTrue(ex.getFieldErrors().containsKey("lastName"));
+        verifyNoInteractions(userRepository, passwordHasher);
+    }
+
+    @Test
     @DisplayName("Login con caracteres no permitidos o contrasena demasiado larga se rechazan")
     void shouldRejectInvalidLoginCharactersAndLongPassword() {
-        RegisterUserCommand invalid = new RegisterUserCommand("mari na", "x".repeat(101), null, null,
+        RegisterUserCommand invalid = new RegisterUserCommand("mari na", "x".repeat(101), "Marina", "Rivadeneira",
                 "marina@example.com", null, null);
 
         InvalidUserDataException ex = assertThrows(InvalidUserDataException.class, () -> useCase.register(invalid));
@@ -124,7 +139,7 @@ class RegisterUserUseCaseTest {
     void shouldRejectLoginEqualToAnotherUsersEmail() {
         when(userRepository.existsByEmail(anyString()))
                 .thenAnswer(invocation -> "ana@example.com".equals(invocation.getArgument(0)));
-        RegisterUserCommand command = new RegisterUserCommand("ana@example.com", "clave-segura", null, null,
+        RegisterUserCommand command = new RegisterUserCommand("ana@example.com", "clave-segura", "Ana", "Perez",
                 "otra@example.com", null, null);
 
         assertThrows(LoginAlreadyUsedException.class, () -> useCase.register(command));
@@ -137,7 +152,7 @@ class RegisterUserUseCaseTest {
     void shouldAllowSameTextAsLoginAndEmailOfTheSameUser() {
         when(passwordHasher.hash(anyString())).thenReturn("hash-argon2");
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        RegisterUserCommand command = new RegisterUserCommand("ana@example.com", "clave-segura", null, null,
+        RegisterUserCommand command = new RegisterUserCommand("ana@example.com", "clave-segura", "Ana", "Perez",
                 "ana@example.com", null, null);
 
         User saved = useCase.register(command);
