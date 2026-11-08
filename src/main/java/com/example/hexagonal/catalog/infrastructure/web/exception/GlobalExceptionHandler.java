@@ -3,6 +3,7 @@ package com.example.hexagonal.catalog.infrastructure.web.exception;
 import com.example.hexagonal.catalog.application.exception.EmailAlreadyUsedException;
 import com.example.hexagonal.catalog.application.exception.EntityNotFoundException;
 import com.example.hexagonal.catalog.application.exception.InvalidCredentialsException;
+import com.example.hexagonal.catalog.application.exception.InvalidSearchCriteriaException;
 import com.example.hexagonal.catalog.application.exception.InvalidUserDataException;
 import com.example.hexagonal.catalog.application.exception.LoginAlreadyUsedException;
 import com.example.hexagonal.catalog.infrastructure.web.ProblemBody;
@@ -35,6 +36,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleInvalidUserData(InvalidUserDataException ex,
                                                                      HttpServletRequest request) {
         return respond(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Los datos enviados no son validos",
+                request, ex.getFieldErrors());
+    }
+
+    @ExceptionHandler(InvalidSearchCriteriaException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidSearchCriteria(InvalidSearchCriteriaException ex,
+                                                                           HttpServletRequest request) {
+        return respond(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Los criterios de busqueda no son validos",
                 request, ex.getFieldErrors());
     }
 
