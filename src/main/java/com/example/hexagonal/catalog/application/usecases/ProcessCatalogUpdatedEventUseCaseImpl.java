@@ -32,6 +32,7 @@ public class ProcessCatalogUpdatedEventUseCaseImpl implements ProcessCatalogUpda
             log.info("Evento {} ya procesado: se ignora", eventId);
             return;
         }
+        log.info("Evento {} recibido: nueva version {}", eventId, newVersion);
         syncCatalogIncrementalUseCase.sync(newVersion);
         processedEventRepository.markProcessed(eventId);
     }

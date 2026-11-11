@@ -55,7 +55,7 @@ public class SyncCatalogIncrementalUseCaseImpl implements SyncCatalogIncremental
         }
 
         if (newVersion <= state.getVersion()) {
-            log.debug("Version {} ya aplicada (local {}): se ignora", newVersion, state.getVersion());
+            log.info("Version {} ya aplicada (local {}): se ignora", newVersion, state.getVersion());
             return;
         }
 

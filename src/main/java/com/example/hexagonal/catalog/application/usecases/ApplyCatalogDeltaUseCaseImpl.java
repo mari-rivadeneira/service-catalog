@@ -12,6 +12,8 @@ import com.example.hexagonal.catalog.domain.port.out.CategoryRepository;
 import com.example.hexagonal.catalog.domain.port.out.ProfessionalRepository;
 import com.example.hexagonal.catalog.domain.port.out.SyncVersionRepository;
 import com.example.hexagonal.catalog.domain.port.out.WeeklyScheduleRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class ApplyCatalogDeltaUseCaseImpl implements ApplyCatalogDeltaUseCase {
+
+    private static final Logger log = LoggerFactory.getLogger(ApplyCatalogDeltaUseCaseImpl.class);
 
     private final CategoryRepository categoryRepository;
     private final ProfessionalRepository professionalRepository;
@@ -51,7 +55,7 @@ public class ApplyCatalogDeltaUseCaseImpl implements ApplyCatalogDeltaUseCase {
 
         long current = state.getVersion();
         if (current >= delta.version()) {
-            return;
+            return; // ya aplicada por otro hilo o evento: idempotente
         }
         if (current != delta.version() - 1) {
             throw new CatalogHistoryUnavailableException(
@@ -60,16 +64,20 @@ public class ApplyCatalogDeltaUseCaseImpl implements ApplyCatalogDeltaUseCase {
 
         verifyReferences(delta);
 
-        // Upsert en orden de FK. Las entidades deshabilitadas se conservan.
+        // Upsert en orden de FK. Las entidades deshabilitadas se conservan (baja logica).
         categoryRepository.saveAll(delta.categories());
         professionalRepository.saveAll(delta.professionals());
         weeklyScheduleRepository.saveAll(delta.schedules());
 
         state.applied(delta.version(), SyncMode.INCREMENTAL);
         syncVersionRepository.save(state);
+
+        log.info("Version {} aplicada de forma incremental ({} categorias, {} profesionales, {} agendas)",
+                delta.version(), delta.categories().size(), delta.professionals().size(),
+                delta.schedules().size());
     }
 
-    // Una referencia imposible de resolver significa que el historial no es confiable: hay que usar snapshot.
+    /** Una referencia imposible de resolver significa que el historial no es confiable: hay que usar snapshot. */
     private void verifyReferences(CatalogDelta delta) {
         Set<Long> categoryIds = delta.categories().stream()
                 .map(ProfessionalCategory::getId).collect(Collectors.toSet());
