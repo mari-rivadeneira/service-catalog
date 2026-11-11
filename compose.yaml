@@ -58,6 +58,41 @@ services:
       retries: 10
       start_period: 20s
 
+  # Servicio de catalogo: solo se levanta con el perfil "app" (docker compose --profile app up -d --build).
+  # Usa la base del compose y se conecta a REST, Redis y Kafka de la catedra con lo definido en .env.
+  catalog-service:
+    build: .
+    container_name: catalog-service
+    profiles: [ "app" ]
+    restart: on-failure:3
+    depends_on:
+      catalog-db:
+        condition: service_healthy
+    ports:
+      - "${APP_PORT:-8080}:8080"
+    environment:
+      DB_URL: jdbc:postgresql://catalog-db:5432/${POSTGRES_DB:-catalog_db}
+      DB_USER: ${POSTGRES_USER:-catalog_user}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-catalog_password}
+      JWT_SECRET: ${JWT_SECRET:-}
+      CATEDRA_API_BASE_URL: ${CATEDRA_API_BASE_URL:-}
+      CATEDRA_JWT_TOKEN: ${CATEDRA_JWT_TOKEN:-}
+      CATEDRA_API_CONNECT_TIMEOUT_MS: ${CATEDRA_API_CONNECT_TIMEOUT_MS:-5000}
+      CATEDRA_API_READ_TIMEOUT_MS: ${CATEDRA_API_READ_TIMEOUT_MS:-10000}
+      CATEDRA_REDIS_HOST: ${CATEDRA_REDIS_HOST:-localhost}
+      CATEDRA_REDIS_PORT: ${CATEDRA_REDIS_PORT:-6379}
+      SPRING_DATA_REDIS_USERNAME: ${SPRING_DATA_REDIS_USERNAME:-}
+      SPRING_DATA_REDIS_PASSWORD: ${SPRING_DATA_REDIS_PASSWORD:-}
+      CATEDRA_KAFKA_BOOTSTRAP_SERVERS: ${CATEDRA_KAFKA_BOOTSTRAP_SERVERS:-localhost:9092}
+      CATEDRA_KAFKA_CONSUMER_GROUP_ID: ${CATEDRA_KAFKA_CONSUMER_GROUP_ID:-alumnos-local-catalog}
+      CATEDRA_KAFKA_CATALOG_TOPIC: ${CATEDRA_KAFKA_CATALOG_TOPIC:-catedra.catalog.local}
+      CATALOG_RECONCILIATION_ENABLED: ${CATALOG_RECONCILIATION_ENABLED:-true}
+      CATALOG_RECONCILIATION_INTERVAL_MS: ${CATALOG_RECONCILIATION_INTERVAL_MS:-300000}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-}
+      PASSWORD_ARGON2_MEMORY_KIB: ${PASSWORD_ARGON2_MEMORY_KIB:-19456}
+      PASSWORD_ARGON2_ITERATIONS: ${PASSWORD_ARGON2_ITERATIONS:-2}
+      PASSWORD_ARGON2_PARALLELISM: ${PASSWORD_ARGON2_PARALLELISM:-1}
+
 volumes:
   catalog_db_data:
   catalog_redis_data:

@@ -8,11 +8,15 @@ import com.example.hexagonal.catalog.domain.port.out.CategoryRepository;
 import com.example.hexagonal.catalog.domain.port.out.ProfessionalRepository;
 import com.example.hexagonal.catalog.domain.port.out.SyncVersionRepository;
 import com.example.hexagonal.catalog.domain.port.out.WeeklyScheduleRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ApplyCatalogSnapshotUseCaseImpl implements ApplyCatalogSnapshotUseCase {
+
+    private static final Logger log = LoggerFactory.getLogger(ApplyCatalogSnapshotUseCaseImpl.class);
 
     private final CategoryRepository categoryRepository;
     private final ProfessionalRepository professionalRepository;
@@ -52,6 +56,10 @@ public class ApplyCatalogSnapshotUseCaseImpl implements ApplyCatalogSnapshotUseC
         // Se registra exactamente la version del snapshot aplicado, en la misma transaccion
         state.rebuiltFromSnapshot(snapshot.getVersion());
         syncVersionRepository.save(state);
+
+        log.info("Snapshot aplicado: version {} ({} categorias, {} profesionales, {} agendas)",
+                snapshot.getVersion(), snapshot.getCategories().size(), snapshot.getProfessionals().size(),
+                snapshot.getSchedules().size());
     }
 
     private void validate(CatedraSnapshot snapshot) {
